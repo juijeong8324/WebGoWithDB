@@ -1,0 +1,41 @@
+name: CI and Update Manifest
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      # 1. Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 2. Build and push image (using commit hash as tag)
+      - name: Build and Push
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/web-go-db:$IMAGE_TAG .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/web-go-db:$IMAGE_TAG
+
+      # 3. Update GitOps manifest repo with new image tag
+      - name: Update Manifest Repo
+        run: |
+          git clone https://${{ secrets.MY_GITHUB_TOKEN }}@github.com/juijeong8324/GitOps.git temp_repo
+          cd temp_repo
+
+          # Replace image tag in 04-deploy.yaml with the new commit hash
+          sed -i "s|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/web-go-db:${{ github.sha }}|g" 04-deploy.yaml
+
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add .
+          git commit -m "Update image to ${{ github.sha }} [skip ci]"
+          git push
