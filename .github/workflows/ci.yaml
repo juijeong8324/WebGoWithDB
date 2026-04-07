@@ -28,7 +28,7 @@ jobs:
       # 3. Update GitOps manifest repo with new image tag
       - name: Update Manifest Repo
         run: |
-          git clone https://${{ secrets.MY_GITHUB_TOKEN }}@github.com/juijeong8324/GitOps.git temp_repo
+          git clone https://${{ secrets.OPS_GITHUB_TOKEN }}@github.com/juijeong8324/GitOps.git temp_repo
           cd temp_repo
 
           # Replace image tag in 04-deploy.yaml with the new commit hash
@@ -38,4 +38,5 @@ jobs:
           git config --global user.name "GitHub Action"
           git add .
           git commit -m "Update image to ${{ github.sha }} [skip ci]"
+          git remote set-url origin https://${{ secrets.OPS_GITHUB_TOKEN }}@github.com/juijeong8324/GitOps.git
           git push
