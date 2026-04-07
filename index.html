@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello UiJeong</title>
+  <style>
+    body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f0f4f8; }
+    .card { background: white; border-radius: 12px; padding: 40px 60px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; }
+    h1 { color: #2d3748; }
+    .count { font-size: 3rem; font-weight: bold; color: #4299e1; margin: 16px 0; }
+    .ip { color: #718096; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Hello, World! 👋</h1>
+    <p>총 방문자 수</p>
+    <div class="count">{{.Count}}명</div>
+    <p class="ip">접속 IP: {{.IP}}</p>
+  </div>
+</body>
+</html>
