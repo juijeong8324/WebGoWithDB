@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	_ "github.com/lib/pq"
 )
@@ -60,6 +61,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 	ip := r.Header.Get("X-Forwarded-For")
 	if ip == "" {
 		ip = r.RemoteAddr
+	} else {
+		// X-Forwarded-For can contain multiple IPs: "client, proxy1, proxy2"
+		// The first one is the real client IP
+		ip = strings.TrimSpace(strings.Split(ip, ",")[0])
 	}
 
 	_, err := db.Exec("INSERT INTO visitors (ip) VALUES ($1)", ip)
@@ -90,6 +95,9 @@ func main() {
 	}
 
 	initDB()
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
 	http.HandleFunc("/", index)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
