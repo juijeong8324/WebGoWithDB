@@ -79,9 +79,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Count int
-		IP    string
-	}{Count: count, IP: ip}
+		Count    int
+		IP       string
+		PodName  string
+	}{Count: count, IP: ip, PodName: os.Getenv("HOSTNAME")}
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	tmpl.Execute(w, data)
